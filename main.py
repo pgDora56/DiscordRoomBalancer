@@ -18,17 +18,33 @@ async def on_ready():
     print(channel)
 
     channel = client.get_channel(conf["entrance_id"])
-    target_members = []
+
+    target_members = {"others": []}
+    fix_roles = ["others"]
+    for role in conf["special_roles"]:
+        fix_roles.append("@"+role)
+        target_members["@"+role] = []
+    print(fix_roles)
+
     for member in channel.voice_states:
         user = await channel.guild.fetch_member(member)
         if not user.bot:
-            target_members.append(user)
-    
-    random.shuffle(target_members)
+            for role in conf["special_roles"]:
+                if role in [r.name for r in user.roles]:
+                    target_members["@"+role].append(user)
+                    break
+            else:
+                target_members["others"].append(user)
+
+    sorted_members = []
+    for role in fix_roles:
+        random.shuffle(target_members[role]) 
+        sorted_members.extend(target_members[role])
 
     channel_idx = 0
-    for member in target_members:
-        await member.move_to(client.get_channel(conf["target_ids"][channel_idx]))
+    for member in sorted_members:
+        # await member.move_to(client.get_channel(conf["target_ids"][channel_idx]))
+        print(f"{member.name}({[r.name for r in member.roles]} -> {client.get_channel(conf['target_ids'][channel_idx]).name}")
         channel_idx = (channel_idx + 1) % len(conf["target_ids"])
 
 
@@ -38,7 +54,7 @@ async def on_voice_state_update(member, before, after):
     # Voiceの状況が変わったときに呼び出される
     if after.channel == None or after.channel.id != conf["entrance_id"]:
         return  # なにもしない
-    await move_person(member)
+    # await move_person(member)
 
 
 async def move_person(member):
