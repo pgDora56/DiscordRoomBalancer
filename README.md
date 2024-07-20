@@ -1,6 +1,11 @@
 # DiscordRoomBalancer
 Balancer of the number of people on the discord voice channel
 
+## How to use
+
+1. Make config.json
+2. Run `python3 main.py`
+
 ## config.json
 
 ```json
