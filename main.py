@@ -43,8 +43,8 @@ async def on_ready():
 
     channel_idx = 0
     for member in sorted_members:
-        # await member.move_to(client.get_channel(conf["target_ids"][channel_idx]))
-        print(f"{member.name}({[r.name for r in member.roles]} -> {client.get_channel(conf['target_ids'][channel_idx]).name}")
+        await member.move_to(client.get_channel(conf["target_ids"][channel_idx]))
+        # print(f"{member.name}({[r.name for r in member.roles]} -> {client.get_channel(conf['target_ids'][channel_idx]).name}")
         channel_idx = (channel_idx + 1) % len(conf["target_ids"])
 
 
@@ -54,7 +54,7 @@ async def on_voice_state_update(member, before, after):
     # Voiceの状況が変わったときに呼び出される
     if after.channel == None or after.channel.id != conf["entrance_id"]:
         return  # なにもしない
-    # await move_person(member)
+    await move_person(member)
 
 
 async def move_person(member):
